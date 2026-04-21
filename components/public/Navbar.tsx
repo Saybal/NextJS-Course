@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { Ghost } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function Navbar() {
     return (
@@ -21,8 +22,9 @@ export default function Navbar() {
 
             {/* User Actions */}
             <div className="flex items-center gap-2">
-                <Link className={buttonVariants()} href="/login">Login</Link>
-                <Link className={buttonVariants({variant: "secondary"})} href="/register">Register</Link>
+                <ThemeToggle/>
+                <Link className={buttonVariants()} href="/auth/login">Login</Link>
+                <Link className={buttonVariants({variant: "secondary"})} href="/auth/register">Register</Link>
             </div>
 
         </nav>
