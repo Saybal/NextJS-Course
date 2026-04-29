@@ -6,12 +6,19 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 export default function Register() {
 
-    // type FormData = z.infer<typeof signUpSchema>
+    const [isPending, startTransition] = useTransition();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get("redirect") || "/";
     
     const form = useForm({
 
@@ -23,12 +30,23 @@ export default function Register() {
         }
     })
 
-    async function onSubmit(data: z.infer<typeof signUpSchema>) {
-        await authClient.signUp.email({
-            email: data.email,
-            password: data.password,
-            name: data.name
-        })
+    function onSubmit(data: z.infer<typeof signUpSchema>) {
+        startTransition(async () => {
+            await authClient.signUp.email({
+                email: data.email,
+                password: data.password,
+                name: data.name,
+                fetchOptions: {
+                          onSuccess: () => {
+                                toast.success("Account created successfully");
+                                router.push(redirect);
+                          },
+                          onError: (error) => {
+                            toast.error(error.error.message);
+                          },
+                        },
+            });
+        });
     }
 
     return (
@@ -90,7 +108,15 @@ export default function Register() {
                             )}
                         />
 
-                        <Button type="submit">Register</Button>
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? (
+                                <>
+                                    <Loader2 className="size-4 animate-spin" /> <span>Registering...</span>
+                                </>
+                            ) : (
+                                "Register"
+                            )}
+                        </Button>
                     </FieldGroup>
                 </form>
             </CardContent>

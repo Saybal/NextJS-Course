@@ -5,9 +5,13 @@ import { Ghost } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { useConvexAuth } from "convex/react";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { Button } from "@base-ui/react/button";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const router = useRouter();
   return (
     <nav className="flex items-center justify-between w-full py-5">
       {/* Logo */}
@@ -37,9 +41,19 @@ export default function Navbar() {
         <ThemeToggle />
         {isLoading ? null : isAuthenticated ? (
           <>
-            <Link className={buttonVariants()} href="/" onClick={() => authClient.signOut({})}>
+            <Button className={buttonVariants()} onClick={() => authClient.signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  toast.success("Logged out successfully")
+                  router.push("/")
+                },
+                onError: (error) => {
+                  toast.error(error.error.message)
+                }
+              }
+            })}>
               LogOut
-            </Link>
+            </Button>
           </>
         ) : (
           <>
