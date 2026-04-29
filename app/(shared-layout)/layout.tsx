@@ -1,10 +1,12 @@
 import Navbar from "@/components/public/Navbar";
+import { ReactNode } from "react";
+import { ConvexClientProvider } from "../ConvexClientProvider";
 
-export default function SharedLayout() {
+export default function SharedLayout({children} : {children : ReactNode}) {
     return (
         <>
             <Navbar/>
-            <h1>This is from shared layout</h1>
+            <ConvexClientProvider>{children}</ConvexClientProvider>
         </>
     )
 }
